@@ -4,12 +4,13 @@ using System.Reflection;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class MultiSelectDropdown: MonoBehaviour
 {
     #region FIELDS
 
-    public delegate void OnIdSelectedDelegate(int id, bool add);
+    public delegate void OnIdSelectedDelegate(int id);
     public OnIdSelectedDelegate OnIdSelected;
 
     [SerializeField]
@@ -48,17 +49,17 @@ public class MultiSelectDropdown: MonoBehaviour
         ToggleButton.onClick.AddListener(ToggleButtonClicked);
     }
 
-    public void SetDropdownData <T> (List<T> objectsToConvert, List<T> listOfSelectedObjects, string idField, string nameField)
+    public void SetDropdownData (IEnumerable<IIDEquatable> objectsToConvert, IEnumerable<IIDEquatable> listOfSelectedObjects, string idField, string nameField)
     {
-        for (int i = 0; i < objectsToConvert.Count; i++)
+        foreach(IIDEquatable objectToConvert in objectsToConvert)
         {
-            GenerateDropdownData(objectsToConvert[i], listOfSelectedObjects, idField, nameField, i);
+            GenerateDropdownData(objectToConvert, listOfSelectedObjects, idField, nameField);
         }
 
         SetDropdownOption();
     }
 
-    private void GenerateDropdownData<T>(T objectsToConvert, List<T> listOfSelectedObjects, string idField, string nameField, int index)
+    private void GenerateDropdownData(IIDEquatable objectsToConvert, IEnumerable<IIDEquatable> listOfSelectedObjects, string idField, string nameField)
     {
         Type type = objectsToConvert.GetType();
         PropertyInfo infoId = type.GetProperty(idField);
@@ -68,7 +69,7 @@ public class MultiSelectDropdown: MonoBehaviour
 
         if (intObj != null && stringObj != null)
         {
-            if (listOfSelectedObjects .Contains(objectsToConvert))
+            if (listOfSelectedObjects.Contains(objectsToConvert))
             {
                 dropdownData.Add(new MultiSelectDropdownData((int)intObj, stringObj.ToString(), true));
             }
@@ -102,7 +103,6 @@ public class MultiSelectDropdown: MonoBehaviour
     {
         string selectedValue = Dropdown.options[Dropdown.value].text;
         int id = -1;
-        bool add = false;
 
         for (int i = 0; i < dropdownData.Count; i++)
         {
@@ -110,11 +110,10 @@ public class MultiSelectDropdown: MonoBehaviour
             {
                 dropdownData[i].ToggleSelection();
                 id = dropdownData[i].Id;
-                add = dropdownData[i].IsSelected;
             }
         }
         SetDropdownOptions(Dropdown.value);
-        OnIdSelected(id, add);
+        OnIdSelected(id);
     }
 
     #endregion

@@ -45,20 +45,21 @@ public class TestScript : MonoBehaviour
         SetTestData(DataList);
         SelectionList.Add(DataList[1]);
 
-        MultiSelect.SetDropdownData<ExampleData>(DataList, SelectionList, nameof(ExampleData.Id), nameof(ExampleData.ExampleName));
+        MultiSelect.SetDropdownData(DataList, SelectionList, nameof(ExampleData.Id), nameof(ExampleData.ExampleName));
         MultiSelect.OnIdSelected += Selection;
     }
 
-    private void Selection(int id, bool add)
+    private void Selection(int id)
     {
-        for (int i = 0; i < DataList.Count; i++)
+        if (id != -1)
         {
-            if (DataList[i].Id == id)
+            ExampleData selectedObject = SelectionList.ContainsOptimized(id);
+            if (selectedObject != null)
             {
-                if (add == true)
-                    SelectionList.Add(DataList[i]);
-                else
-                    SelectionList.Remove(DataList[i]);
+                SelectionList.Remove(selectedObject);
+            } else
+            {
+                SelectionList.Add(DataList.ContainsOptimized(id));
             }
         }
     }

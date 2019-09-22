@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ExampleData
+public class ExampleData: IIDEquatable
 {
     #region FIELDS
 
@@ -49,5 +49,11 @@ public class ExampleData
         ExampleName = name;
         SuperSecretPassword = password;
     }
+
+    public bool CompareById(int id)
+    {
+        return Id == id;
+    }
+
     #endregion
 }
